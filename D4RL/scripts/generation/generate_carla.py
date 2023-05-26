@@ -63,13 +63,12 @@ def main():
     parser.add_argument('--num_samples', type=int, default=int(1e6), help='Num samples to collect')
     args = parser.parse_args()
 
-    env = gym.make('carla-lane-v0')
-    # maze = env.str_maze_spec
+    # env = gym.make('carla-lane-v0')
+    env = gym.make('carla-town-full-v0')
+
     vehicle = env.vehicle
     max_episode_steps = env._max_episode_steps
 
-    # default: p=10, d=-1
-    # controller = VehiclePIDController(vehicle, args_lateral, args_longitudinal)
     planner = LocalPlanner(vehicle)
     planner._init_controller()
 
@@ -85,13 +84,10 @@ def main():
     ts = 0
 
     for _ in range(args.num_samples):
-        # subtract 1.0 due to offset between tabular maze representation and bullet state
-        # act, done = controller.get_action(position , velocity, env._target)
 
-        # print (planner._waypoints_queue)
-
-        control = planner.run_step() # these are control values: VehicleControl(throttle=0.750000, steer=-0.100000, brake=0.000000, hand_brake=False, reverse=False, manual_gear_shift=False, gear=0)
-        # done = planner.done() # checks if we have reached all waypoints or not
+        control = planner.run_step() 
+        # these are control values: VehicleControl(throttle=0.750000, steer=-0.100000, brake=0.000000, hand_brake=False, reverse=False, manual_gear_shift=False, gear=0)
+        
         throttle = control.throttle
         steer = control.steer
         brake = control.brake
@@ -112,7 +108,6 @@ def main():
         ns, reward, done, info = env.step(act)    
         # We might want to add info also    
         
-        # append_data(data, s, act, env._target, done, timeout, env.robot)
         append_data(data, s, act, reward, done, timeout)
         print (len(data['observations']))
 

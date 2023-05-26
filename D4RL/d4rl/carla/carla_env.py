@@ -45,8 +45,8 @@ except ImportError:
 # This is CARLA agent
 # from agents.navigation.agent import Agent, AgentState
 from agents.navigation.local_planner import LocalPlanner
+from agents.navigation.global_route_planner_dao import GlobalRoutePlannerDAO
 from agents.navigation.global_route_planner import GlobalRoutePlanner
-# from agents.navigation.global_route_planner_dao import GlobalRoutePlannerDAO
 from agents.tools.misc import is_within_distance_ahead, compute_magnitude_angle
 
 def is_within_distance(target_location, current_location, orientation, max_distance, d_angle_th_up, d_angle_th_low=0):
@@ -391,9 +391,11 @@ class CarlaEnv(object):
         self.object_list = self.actor_list.filter("*traffic.*")
 
         # town nav
-        # self.route_planner_dao = GlobalRoutePlannerDAO(self.map, sampling_resolution=0.1) 
-        # self.route_planner = CustomGlobalRoutePlanner(self.route_planner_dao)
-        # self.route_planner.setup()
+        self.route_planner_dao = GlobalRoutePlannerDAO(self.map, sampling_resolution=0.1) 
+        self.route_planner = CustomGlobalRoutePlanner(self.route_planner_dao)
+        self.route_planner.setup()
+        # self.route_planner = GlobalRoutePlanner(self.map, sampling_resolution=0.1)
+
         self.target_location = carla.Location(x=-13.473097, y=134.311234, z=-0.010433)
 
         # roaming carla agent
