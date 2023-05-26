@@ -454,6 +454,7 @@ class CarlaEnv(object):
         obs, _, done, _ = self.step()
 
         # keep resetting until vehicle is not collided
+        print ('resetting...')
         total_resets = 0
         while done:
             self.reset_vehicle()
@@ -461,6 +462,7 @@ class CarlaEnv(object):
             obs, _, done, _ = self.step()
             total_resets += 1
             if total_resets > 10:
+                print ('some issue...')
                 break
 
         return obs

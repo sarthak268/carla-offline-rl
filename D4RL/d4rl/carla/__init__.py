@@ -134,8 +134,8 @@ register(
         'dataset_url': 'http://rail.eecs.berkeley.edu/datasets/offline_rl/carla/carla_town_flat-v0.hdf5',
         'reward_type': 'both',
         'carla_args': dict(
-            vision_size=48,
-            vision_fov=48,
+            vision_size=96,
+            vision_fov=96,
             weather=False,
             frame_skip=1,
             steps=TOWN_STEPS,

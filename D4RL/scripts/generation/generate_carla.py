@@ -100,6 +100,13 @@ def main():
         if args.noisy:
             act = act + np.random.randn(*act.shape)*0.5
 
+        # get current lane information for the agent
+        # loc = env.vehicle.get_location() 
+        # if loc is not None:
+        #     w = env.map.get_waypoint(loc)
+        #     if w is not None:
+        #         current_lane_id = w.lane_id
+
         # act = np.clip(act, -1.0, 1.0)
         if ts >= max_episode_steps:
             timeout = True
@@ -109,7 +116,7 @@ def main():
         # We might want to add info also    
         
         append_data(data, s, act, reward, done, timeout)
-        print (len(data['observations']))
+        # print (len(data['observations']))
 
         if len(data['observations']) % 10000 == 0:
             print(len(data['observations']))
@@ -118,11 +125,12 @@ def main():
         if done:
             # env.set_target()
             planner._compute_next_waypoints()
+            s = env.reset()
+            ns = s
 
             done = False
             ts = 0
         else:
-            last_position = s[0:2]
             s = ns
 
         if args.render:
