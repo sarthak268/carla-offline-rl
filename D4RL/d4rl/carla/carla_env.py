@@ -264,7 +264,7 @@ class CarlaEnv(object):
     """
     CARLA agent, we will wrap this in a proxy env to get a gym env
     """
-    def __init__(self, render=False, carla_port=2000, record=False, record_dir=None, args=None, record_vision=False, reward_type='lane_follow', **kwargs):
+    def __init__(self, render=False, carla_port=2000, record=False, record_dir=None, args=None, record_vision=False, reward_type='both', **kwargs):
         self.render_display = render
         self.record_display = record
         print('[CarlaEnv] record_vision:', record_vision)
@@ -277,6 +277,7 @@ class CarlaEnv(object):
         self.frame_skip = args['frame_skip']
         self.max_episode_steps = args['steps']  # DMC uses this
         self.multiagent = args['multiagent']
+        print ('multiagent==========', self.multiagent)
         self.start_lane = args['lane']
         self.follow_traffic_lights = args['lights']
         if self.record_display:
@@ -414,6 +415,30 @@ class CarlaEnv(object):
         #
 
         self.count = 0
+
+    def get_actor_blueprints(self, world, filter, generation):
+        bps = world.get_blueprint_library().filter(filter)
+
+        if generation.lower() == "all":
+            return bps
+
+        # If the filter returns only one bp, we assume that this one needed
+        # and therefore, we ignore the generation
+        if len(bps) == 1:
+            return bps
+
+        try:
+            int_generation = int(generation)
+            # Check if generation is in available generations
+            if int_generation in [1, 2]:
+                bps = [x for x in bps if int(x.get_attribute('generation')) == int_generation]
+                return bps
+            else:
+                print("   Warning! Actor Generation is not valid. No actor will be spawned.")
+                return []
+        except:
+            print("   Warning! Actor Generation is not valid. No actor will be spawned.")
+            return []
 
     def reset(self):
         #self.reset_vehicle()
@@ -819,7 +844,18 @@ class CarlaEnv(object):
         done_dict['object_collided_done'] = object_collided_done
         done_dict['base_done'] = done
         return total_reward, reward_dict, done_dict
-    
+
+    def combination_of_both_reward(self, vehicle):
+        lane_follow_reward, lane_follow_reward_dict, lane_follow_done_dict = self.lane_follow_reward(vehicle)
+        goal_reaching_reward, goal_reaching_reward_dict, goal_reaching_done_dict = self.goal_reaching_reward(vehicle)
+
+        total_reward = lane_follow_reward + goal_reaching_reward
+
+        reward_dict = lane_follow_reward_dict
+        done_dict = lane_follow_done_dict
+
+        return total_reward, reward_dict, done_dict
+        
     def _simulator_step(self, action, traffic_light_color):
         
         if action is None:
@@ -957,6 +993,8 @@ class CarlaEnv(object):
             reward, reward_dict, done_dict = self.lane_follow_reward(self.vehicle)
         elif self.reward_type=='goal_reaching':
             reward, reward_dict, done_dict = self.goal_reaching_reward(self.vehicle)
+        elif self.reward_type == 'both':
+            reward, reward_dict, done_dict = self.combination_of_both_reward(self.vehicle)
         else:
             raise ValueError('unknown reward type:', self.reward_type)
 

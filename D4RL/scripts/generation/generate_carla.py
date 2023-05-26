@@ -64,7 +64,7 @@ def main():
     args = parser.parse_args()
 
     # env = gym.make('carla-lane-v0')
-    env = gym.make('carla-town-full-v0')
+    env = gym.make('carla-town-ours-v0')
 
     vehicle = env.vehicle
     max_episode_steps = env._max_episode_steps

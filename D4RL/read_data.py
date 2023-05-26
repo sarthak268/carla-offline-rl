@@ -19,8 +19,10 @@ terminals = f1['terminals']
 timeouts = f1['timeouts']
 # (100000,) (100000,) (100000,)
 
-save_num = 10
-for i in range(save_num):
+start = 0
+save_num = 200
+
+for i in range(start, start+save_num):
     obs = observations[i]
     obs = obs.reshape(48, 48, 3)
     imsave('./saved_imgs/{}.jpg'.format(i), obs)

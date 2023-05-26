@@ -124,3 +124,25 @@ register(
     }
 )
 
+register(
+    id='carla-town-ours-v0',
+    entry_point='d4rl.carla:CarlaObsEnv',
+    max_episode_steps=100,
+    kwargs={
+        'ref_min_score': -114.81579500772153,  # Average random returns
+        'ref_max_score': 2440.1772022247314, # Average dataset returns
+        'dataset_url': 'http://rail.eecs.berkeley.edu/datasets/offline_rl/carla/carla_town_flat-v0.hdf5',
+        'reward_type': 'both',
+        'carla_args': dict(
+            vision_size=48,
+            vision_fov=48,
+            weather=False,
+            frame_skip=1,
+            steps=TOWN_STEPS,
+            multiagent=True,
+            lane=0,
+            lights=False,
+            record_dir="None",
+        )
+    }
+)
