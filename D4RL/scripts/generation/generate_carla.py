@@ -135,9 +135,9 @@ def main():
 
     
     if args.noisy:
-        fname = '%s-noisy-carla.hdf5' % args.env_name
+        fname = 'noisy-carla.hdf5' 
     else:
-        fname = '%s-carla.hdf5' % args.env_name
+        fname = 'carla.hdf5'
     dataset = h5py.File(fname, 'w')
     npify(data)
     for k in data:

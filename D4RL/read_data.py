@@ -1,5 +1,10 @@
 import h5py
-f1 = h5py.File('/home/sarthak/.d4rl/datasets/carla_lane_follow_flat-v0.hdf5', 'r')
+import numpy as np
+import torch
+from matplotlib.image import imsave
+
+# f1 = h5py.File('/home/sarthak/.d4rl/datasets/carla_lane_follow_flat-v0.hdf5', 'r')
+f1 = h5py.File('carla_waypoints.hdf5', 'r')
 
 # print (f1.keys()) --> <KeysViewHDF5 ['actions', 'observations', 'rewards', 'terminals', 'timeouts']>
 
@@ -13,3 +18,11 @@ rewards = f1['rewards']
 terminals = f1['terminals']
 timeouts = f1['timeouts']
 # (100000,) (100000,) (100000,)
+
+save_num = 10
+for i in range(save_num):
+    obs = observations[i]
+    obs = obs.reshape(48, 48, 3)
+    imsave('./saved_imgs/{}.jpg'.format(i), obs)
+
+
