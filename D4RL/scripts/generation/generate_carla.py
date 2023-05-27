@@ -20,6 +20,7 @@ def reset_data():
             'terminals': [],
             'timeouts': [],
             'rewards': [],
+            'lane_id': [],
             # 'infos/goal': [],
             # 'infos/qpos': [],
             # 'infos/qvel': [],
@@ -37,12 +38,13 @@ def reset_data():
     # data['infos/qpos'].append(robot.qpos.copy())
     # data['infos/qvel'].append(robot.qvel.copy())
 
-def append_data(data, s, act, reward, done, timeout):
+def append_data(data, s, act, reward, done, timeout, lane_id):
     data['observations'].append(s)
     data['actions'].append(act)
     data['rewards'].append(reward)
     data['terminals'].append(done)
     data['timeouts'].append(timeout)
+    data['lane_id'].append(lane_id)
     
 
 def npify(data):
@@ -83,7 +85,10 @@ def main():
     data = reset_data()
     ts = 0
 
-    for _ in range(args.num_samples):
+    for step in range(args.num_samples):
+
+        # if step % 100 == 10:
+        #     env.traffic_manager.distance_to_leading_vehicle(env.vehicle, 0)
 
         control = planner.run_step() 
         # these are control values: VehicleControl(throttle=0.750000, steer=-0.100000, brake=0.000000, hand_brake=False, reverse=False, manual_gear_shift=False, gear=0)
@@ -101,11 +106,11 @@ def main():
             act = act + np.random.randn(*act.shape)*0.5
 
         # get current lane information for the agent
-        # loc = env.vehicle.get_location() 
-        # if loc is not None:
-        #     w = env.map.get_waypoint(loc)
-        #     if w is not None:
-        #         current_lane_id = w.lane_id
+        loc = env.vehicle.get_location() 
+        if loc is not None:
+            w = env.map.get_waypoint(loc)
+            if w is not None:
+                current_lane_id = w.lane_id
 
         # act = np.clip(act, -1.0, 1.0)
         if ts >= max_episode_steps:
@@ -115,8 +120,8 @@ def main():
         ns, reward, done, info = env.step(act)    
         # We might want to add info also    
         
-        append_data(data, s, act, reward, done, timeout)
-        # print (len(data['observations']))
+        append_data(data, s, act, reward, done, timeout, current_lane_id)
+        print (len(data['observations']))
 
         if len(data['observations']) % 10000 == 0:
             print(len(data['observations']))

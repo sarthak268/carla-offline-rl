@@ -476,8 +476,7 @@ class CarlaEnv(object):
         else:
             init_transforms = self.world.get_map().get_spawn_points()
             vehicle_init_transform = random.choice(init_transforms)
-            #print('MyInitTransform', vehicle_init_transform)
-        
+            #print('MyInitTransform', vehicle_init_transform)        
 
         if self.vehicle is None:  # then create the ego vehicle
             blueprint_library = self.world.get_blueprint_library()
@@ -497,13 +496,13 @@ class CarlaEnv(object):
         self.world.tick()
         self.vehicles_list = []
 
-        traffic_manager = self.client.get_trafficmanager()
-        traffic_manager.set_global_distance_to_leading_vehicle(2.0)
-        traffic_manager.set_synchronous_mode(True)
+        self.traffic_manager = self.client.get_trafficmanager()
+        self.traffic_manager.set_global_distance_to_leading_vehicle(2.0)
+        self.traffic_manager.set_synchronous_mode(True)
         blueprints = self.world.get_blueprint_library().filter('vehicle.*')
         blueprints = [x for x in blueprints if int(x.get_attribute('number_of_wheels')) == 4]
 
-        num_vehicles = 20
+        num_vehicles = 200
         if self.map.name == "Town04":
             road_id = 47
             road_length = 117.
@@ -545,7 +544,10 @@ class CarlaEnv(object):
             else:
                 self.vehicles_list.append(response.actor_id)
 
-        traffic_manager.global_percentage_speed_difference(30.0)
+        self.traffic_manager.global_percentage_speed_difference(30.0)
+        # self.traffic_manager.distance_to_leading_vehicle(self.vehicle, 0)
+        # self.random_left_lanechange_percentage(20)
+        # self.random_right_lanechange_percentage(20)
     
     def step(self, action=None, traffic_light_color=""):
         """
