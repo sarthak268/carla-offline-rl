@@ -502,7 +502,7 @@ class CarlaEnv(object):
         blueprints = self.world.get_blueprint_library().filter('vehicle.*')
         blueprints = [x for x in blueprints if int(x.get_attribute('number_of_wheels')) == 4]
 
-        num_vehicles = 200
+        num_vehicles = 20
         if self.map.name == "Town04":
             road_id = 47
             road_length = 117.
@@ -548,6 +548,48 @@ class CarlaEnv(object):
         # self.traffic_manager.distance_to_leading_vehicle(self.vehicle, 0)
         # self.random_left_lanechange_percentage(20)
         # self.random_right_lanechange_percentage(20)
+
+    def spawn_vehicles_around_ego_vehicles(self):
+        '''
+        parameters:
+        ego_vehicle :: your target vehicle
+        radius :: the distance limitation between ego-vehicle and other free-vehicles
+        spawn_points  :: the available spawn points in current map
+        numbers_of_vehicles :: the number of free-vehicles around ego-vehicle that you need
+        '''
+
+        spawn_points = self.world.get_map().get_spawn_points()
+        radius = 100
+        numbers_of_vehicles = 10
+        ego_vehicle = self.vehicle
+        
+        np.random.shuffle(spawn_points)  # shuffle  all the spawn points
+        ego_location = ego_vehicle.get_location()
+        accessible_points = []
+        for spawn_point in spawn_points:
+            dis = math.sqrt((ego_location.x-spawn_point.location.x)**2 + (ego_location.y-spawn_point.location.y)**2)
+            # it also can include z-coordinate,but it is unnecessary
+            if dis < radius:
+                # print(dis)
+                accessible_points.append(spawn_point)
+
+        vehicle_bps = self.world.get_blueprint_library().filter('vehicle.*.*')   # don't specify the type of vehicle
+        vehicle_bps = [x for x in vehicle_bps if int(x.get_attribute('number_of_wheels')) == 4]  # only choose car with 4 wheels
+
+        vehicle_list = []  # keep the spawned vehicle in vehicle_list, because we need to link them with traffic_manager
+        if len(accessible_points) < numbers_of_vehicles:
+            # if your radius is relatively small,the satisfied points may be insufficient
+            numbers_of_vehicles = len(accessible_points)
+
+        for i in range(numbers_of_vehicles):  # generate the free vehicle
+            point = accessible_points[i]
+            vehicle_bp = np.random.choice(vehicle_bps)
+            try:
+                vehicle = self.world.spawn_actor(vehicle_bp, point)
+                vehicle_list.append(vehicle)
+            except:
+                print('failed')  # if failed, print the hints.
+                pass        
     
     def step(self, action=None, traffic_light_color=""):
         """

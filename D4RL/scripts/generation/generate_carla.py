@@ -88,10 +88,13 @@ def main():
     for step in range(args.num_samples):
 
         # if step % 100 == 10:
-        #     env.traffic_manager.distance_to_leading_vehicle(env.vehicle, 0)
+        #     env.traffic_manager.distance_to_leading_vehicle(env.vehicle, 5)
+
+        env.spawn_vehicles_around_ego_vehicles()
 
         control = planner.run_step() 
-        # these are control values: VehicleControl(throttle=0.750000, steer=-0.100000, brake=0.000000, hand_brake=False, reverse=False, manual_gear_shift=False, gear=0)
+        # these are control values: VehicleControl(throttle=0.750000, steer=-0.100000, brake=0.000000,
+                                    #  hand_brake=False, reverse=False, manual_gear_shift=False, gear=0)
         
         throttle = control.throttle
         steer = control.steer

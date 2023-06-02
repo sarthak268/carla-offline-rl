@@ -20,7 +20,7 @@ timeouts = f1['timeouts']
 # (100000,) (100000,) (100000,)
 
 start = 0
-save_num = 500
+save_num = 2000
 
 for i in range(start, start+save_num):
     obs = observations[i]
