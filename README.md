@@ -1,4 +1,6 @@
-# carla-offline-rl
+# Carla Offline RL Data Generation
+
+This repository contains code for generating the data for training offline RL agents for the CARLA simulator.
 
 For CARLA in docker:
 ```
